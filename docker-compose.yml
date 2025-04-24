@@ -88,7 +88,7 @@ services:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=6379
-      - KAFKA_SERVER=${KAFKA_SERVER}
+      - KAFKA_SERVER=kafka:9092
       - WEBHOOK_HOST=${WEBHOOK_HOST:-localhost}
     volumes:
       - ./notifier-service/logs:/app/logs:rw
@@ -99,6 +99,7 @@ services:
         condition: service_healthy
     networks:
       - task-network
+    container_name: notifier-service
 
   # Prometheus
   prometheus:

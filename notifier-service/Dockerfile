@@ -27,3 +27,4 @@ USER appuser
 
 # Use wait script to ensure Kafka is ready before starting the application
 CMD ["/wait-for-kafka.sh", "kafka", "9092", "python", "main.py"] 
+
