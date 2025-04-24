@@ -1,0 +1,7 @@
+kafka-python==2.0.2
+prometheus-client==0.17.1
+python-dotenv==1.0.0
+aiogram>=3.0.0
+redis==5.0.1
+faststream[kafka]
+certifi 
