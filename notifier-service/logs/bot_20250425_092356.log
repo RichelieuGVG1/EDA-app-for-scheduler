@@ -1,0 +1,14 @@
+2025-04-25 09:23:56,704 - __main__ - INFO - Initializing bot with token: 8187811947...
+2025-04-25 09:23:56,704 - __main__ - INFO - Redis host: redis
+2025-04-25 09:23:56,705 - __main__ - INFO - Redis port: 6379
+2025-04-25 09:23:56,705 - __main__ - INFO - Kafka server: kafka:9092
+2025-04-25 09:23:56,709 - __main__ - INFO - Successfully connected to Redis
+2025-04-25 09:23:56,739 - __main__ - INFO - Starting bot application
+2025-04-25 09:23:56,740 - aiogram.dispatcher - INFO - Start polling
+2025-04-25 09:23:56,905 - aiogram.dispatcher - INFO - Run polling for bot @task_misis_bot id=8187811947 - 'task bot misis'
+2025-04-25 09:24:05,801 - __main__ - INFO - User 895164426 viewed their tasks
+2025-04-25 09:24:05,801 - aiogram.event - INFO - Update id=991745758 is handled. Duration 206 ms by bot id=8187811947
+2025-04-25 09:25:32,324 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2025-04-25 09:25:32,325 - aiogram.dispatcher - INFO - Polling stopped for bot @task_misis_bot id=8187811947 - 'task bot misis'
+2025-04-25 09:25:32,326 - aiogram.dispatcher - INFO - Polling stopped
+2025-04-25 09:25:32,581 - __main__ - INFO - Application shutdown completed

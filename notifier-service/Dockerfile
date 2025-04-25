@@ -24,6 +24,7 @@ RUN useradd -m appuser && chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8443
+#EXPOSE 8000
 
 # Устанавливаем ENTRYPOINT на скрипт ожидания Kafka
 ENTRYPOINT ["/app/wait-for-kafka.sh"]

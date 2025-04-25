@@ -91,6 +91,7 @@ services:
     entrypoint: ["/wait-for-kafka.sh", "kafka:9092", "--", "python", "main.py"]
     ports:
       - "8443:8443"
+      #- "8000:8000"
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - REDIS_HOST=${REDIS_HOST}
