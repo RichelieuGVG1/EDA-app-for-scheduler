@@ -9,12 +9,12 @@ from aiogram.enums import ParseMode
 from faststream.kafka import KafkaBroker
 import json
 import redis
-from datetime import datetime
+from datetime import datetime, timedelta
 import ssl
 import certifi
 from prometheus_client import Counter, start_http_server
 from aiogram.filters import Command
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from aiohttp import web
 import threading
 from dotenv import load_dotenv
@@ -49,6 +49,8 @@ logger = setup_logging()
 NOTIFICATIONS_SENT = Counter('notifications_sent_total', 'Total number of notifications sent')
 TASKS_CREATED = Counter('tasks_created_total', 'Total number of tasks created via bot')
 TASKS_LISTED = Counter('tasks_listed_total', 'Total number of task listings')
+TASKS_RESCHEDULED = Counter('tasks_rescheduled_total', 'Total number of tasks rescheduled')
+TASKS_COMPLETED = Counter('tasks_completed_total', 'Total number of tasks completed')
 
 # Load environment variables
 TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
@@ -110,6 +112,7 @@ def create_kafka_consumer():
     logger.info("Creating Kafka consumer...")
     consumer = KafkaConsumer(
         'task_due_soon',
+        'task_overdue',
         bootstrap_servers=os.getenv('KAFKA_BROKER', 'localhost:9092'),
         group_id='telegram-notifier-bot',
         auto_offset_reset='earliest',
@@ -238,8 +241,47 @@ async def process_kafka_messages():
                         user_id = task_data.get('user_id')
                         task_title = task_data.get('title')
                         due_date = task_data.get('due_date')
+                        status = task_data.get('status')
+                        task_id = task_data.get('id')
                         
-                        if user_id and task_title and due_date:
+                        if not all([user_id, task_title, due_date, task_id]):
+                            logger.warning(f"Missing required fields in task data: {task_data}")
+                            continue
+                            
+                        if status == 'overdue':
+                            message_text = (
+                                f"⚠️ Task Overdue!\n\n"
+                                f"Task: {task_title}\n"
+                                f"Due Date: {due_date}\n\n"
+                                f"This task is overdue by 1 day!"
+                            )
+                            
+                            # Create inline keyboard for overdue task
+                            keyboard = InlineKeyboardMarkup(
+                                inline_keyboard=[
+                                    [
+                                        InlineKeyboardButton(
+                                            text="Reschedule for tomorrow",
+                                            callback_data=f"reschedule_{task_id}"
+                                        )
+                                    ],
+                                    [
+                                        InlineKeyboardButton(
+                                            text="Mark as completed",
+                                            callback_data=f"complete_{task_id}"
+                                        )
+                                    ]
+                                ]
+                            )
+                            
+                            await bot.send_message(
+                                chat_id=user_id,
+                                text=message_text,
+                                parse_mode=ParseMode.HTML,
+                                reply_markup=keyboard
+                            )
+                            logger.info(f"Overdue task notification sent to user {user_id}")
+                        else:
                             message_text = (
                                 f"🔔 Task Reminder\n\n"
                                 f"Task: {task_title}\n"
@@ -247,18 +289,14 @@ async def process_kafka_messages():
                                 f"This task is due soon!"
                             )
                             
-                            try:
-                                await bot.send_message(
-                                    chat_id=user_id,
-                                    text=message_text,
-                                    parse_mode=ParseMode.HTML
-                                )
-                                NOTIFICATIONS_SENT.inc()
-                                logger.info(f"Notification sent to user {user_id}")
-                            except Exception as e:
-                                logger.error(f"Failed to send notification to user {user_id}: {str(e)}")
-                        else:
-                            logger.warning(f"Invalid task data received: {task_data}")
+                            await bot.send_message(
+                                chat_id=user_id,
+                                text=message_text,
+                                parse_mode=ParseMode.HTML
+                            )
+                            logger.info(f"Due soon notification sent to user {user_id}")
+                            
+                        NOTIFICATIONS_SENT.inc()
                             
                     except Exception as e:
                         logger.error(f"Error processing Kafka message: {str(e)}")
@@ -274,6 +312,64 @@ async def process_kafka_messages():
     finally:
         consumer.close()
         logger.info("Kafka consumer closed")
+
+@dp.callback_query(lambda c: c.data.startswith('reschedule_'))
+async def process_reschedule(callback_query: types.CallbackQuery):
+    task_id = callback_query.data.split('_')[1]
+    user_id = callback_query.from_user.id
+    
+    # Get task data from Redis
+    task_key = f"task:{user_id}:{task_id}"
+    task_data = redis_client.hgetall(task_key)
+    
+    if task_data:
+        # Update due date to tomorrow
+        current_due_date = datetime.strptime(task_data[b'due_date'].decode('utf-8'), '%Y-%m-%d')
+        new_due_date = current_due_date + timedelta(days=1)
+        
+        # Update task in Redis
+        redis_client.hset(task_key, 'due_date', new_due_date.strftime('%Y-%m-%d'))
+        
+        # Send confirmation message
+        await callback_query.message.edit_text(
+            f"✅ Task rescheduled to {new_due_date.strftime('%Y-%m-%d')}",
+            reply_markup=None
+        )
+        
+        TASKS_RESCHEDULED.inc()
+        logger.info(f"Task {task_id} rescheduled for user {user_id}")
+    else:
+        await callback_query.message.edit_text(
+            "❌ Task not found",
+            reply_markup=None
+        )
+
+@dp.callback_query(lambda c: c.data.startswith('complete_'))
+async def process_complete(callback_query: types.CallbackQuery):
+    task_id = callback_query.data.split('_')[1]
+    user_id = callback_query.from_user.id
+    
+    # Get task data from Redis
+    task_key = f"task:{user_id}:{task_id}"
+    task_data = redis_client.hgetall(task_key)
+    
+    if task_data:
+        # Mark task as completed
+        redis_client.hset(task_key, 'status', 'completed')
+        
+        # Send confirmation message
+        await callback_query.message.edit_text(
+            "✅ Task marked as completed",
+            reply_markup=None
+        )
+        
+        TASKS_COMPLETED.inc()
+        logger.info(f"Task {task_id} completed by user {user_id}")
+    else:
+        await callback_query.message.edit_text(
+            "❌ Task not found",
+            reply_markup=None
+        )
 
 async def start_bot():
     logger.info("Starting Telegram bot...")
