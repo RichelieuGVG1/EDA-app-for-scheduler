@@ -5,26 +5,26 @@ WORKDIR /app
 # Install netcat for wait script
 RUN apt-get update && apt-get install -y netcat-traditional && rm -rf /var/lib/apt/lists/*
 
-# Create logs directory with proper permissions
-RUN mkdir -p /app/logs && chmod 777 /app/logs
-
-# Copy wait script and make it executable
-COPY wait-for-kafka.sh /wait-for-kafka.sh
-RUN chmod +x /wait-for-kafka.sh
-
-# Copy requirements and install dependencies
+# Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy the rest of the application
 COPY . .
 
-EXPOSE 8443
+# Create logs directory and set permissions
+RUN mkdir -p /app/logs && chmod 777 /app/logs
+
+# Make wait script executable
+RUN chmod +x /app/wait-for-kafka.sh
 
 # Run as non-root user
 RUN useradd -m appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Use wait script to ensure Kafka is ready before starting the application
-CMD ["/wait-for-kafka.sh", "kafka", "9092", "python", "main.py"] 
+EXPOSE 8443
+
+# Use the wait script to ensure Kafka is ready
+ENTRYPOINT ["/app/wait-for-kafka.sh"]
+CMD ["kafka", "9092", "60", "--", "python", "main.py"]
 

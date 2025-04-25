@@ -27,6 +27,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - task-network
 
   kafka:
     image: confluentinc/cp-kafka:7.3.0
@@ -43,6 +45,10 @@ services:
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
       KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+    networks:
+      - task-network
     healthcheck:
       test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
       interval: 10s
@@ -82,6 +88,14 @@ services:
   # Notifier Service (Telegram Bot) - depends on Kafka and Redis
   notifier-service:
     build: ./notifier-service
+    entrypoint:
+      - "/app/wait-for-kafka.sh"
+      - "kafka"
+      - "9092"
+      - "60"
+      - "--"
+      - "python"
+      - "main.py"
     ports:
       - "8443:8443"
     environment:
@@ -100,6 +114,7 @@ services:
     networks:
       - task-network
     container_name: notifier-service
+    
 
   # Prometheus
   prometheus:
