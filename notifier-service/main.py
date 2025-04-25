@@ -18,6 +18,7 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiohttp import web
 import threading
 from dotenv import load_dotenv
+from kafka import KafkaConsumer
 
 load_dotenv()
 
@@ -83,7 +84,7 @@ except Exception as e:
 # Initialize bot and dispatcher
 bot = Bot(token=TELEGRAM_BOT_TOKEN)
 storage = MemoryStorage()
-dp = Dispatcher(bot, storage=storage)
+dp = Dispatcher(bot=bot, storage=storage)
 
 # Initialize Kafka broker
 kafka_broker = KafkaBroker(KAFKA_SERVER)
@@ -121,7 +122,7 @@ def create_kafka_consumer():
     return consumer
 
 # Command handlers
-@dp.message_handler(commands=['start'])
+@dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     user_id = message.from_user.id
     await message.answer(
@@ -132,7 +133,7 @@ async def cmd_start(message: types.Message):
     )
     logger.info(f"User {user_id} started the bot")
 
-@dp.message_handler(commands=['help'])
+@dp.message(Command("help"))
 async def cmd_help(message: types.Message):
     help_text = (
         "📋 Available commands:\n\n"
@@ -144,58 +145,56 @@ async def cmd_help(message: types.Message):
     await message.answer(help_text)
     logger.info(f"Help command used by user {message.from_user.id}")
 
-@dp.message_handler(commands=['newtask'])
-async def cmd_new_task(message: types.Message):
-    await TaskStates.waiting_for_title.set()
+@dp.message(Command("newtask"))
+async def cmd_new_task(message: types.Message, state: FSMContext):
+    await state.set_state(TaskStates.waiting_for_title)
     await message.answer("Please enter the task title:")
     logger.info(f"User {message.from_user.id} started creating a new task")
 
-@dp.message_handler(state=TaskStates.waiting_for_title)
+@dp.message(TaskStates.waiting_for_title)
 async def process_title(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['title'] = message.text
-    await TaskStates.next()
+    await state.update_data(title=message.text)
+    await state.set_state(TaskStates.waiting_for_description)
     await message.answer("Please enter the task description:")
 
-@dp.message_handler(state=TaskStates.waiting_for_description)
+@dp.message(TaskStates.waiting_for_description)
 async def process_description(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['description'] = message.text
-    await TaskStates.next()
+    await state.update_data(description=message.text)
+    await state.set_state(TaskStates.waiting_for_due_date)
     await message.answer("Please enter the due date (YYYY-MM-DD):")
 
-@dp.message_handler(state=TaskStates.waiting_for_due_date)
+@dp.message(TaskStates.waiting_for_due_date)
 async def process_due_date(message: types.Message, state: FSMContext):
     try:
         due_date = datetime.strptime(message.text, '%Y-%m-%d')
-        async with state.proxy() as data:
-            task_data = {
-                'user_id': message.from_user.id,
-                'title': data['title'],
-                'description': data['description'],
-                'due_date': due_date.strftime('%Y-%m-%d'),
-                'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            }
-            
-            # Store task in Redis
-            task_key = f"task:{message.from_user.id}:{datetime.now().timestamp()}"
-            redis_client.hmset(task_key, task_data)
-            
-            await message.answer(
-                f"✅ Task created successfully!\n\n"
-                f"Title: {data['title']}\n"
-                f"Description: {data['description']}\n"
-                f"Due Date: {message.text}"
-            )
-            logger.info(f"Task created for user {message.from_user.id}")
-            
+        data = await state.get_data()
+        task_data = {
+            'user_id': message.from_user.id,
+            'title': data['title'],
+            'description': data['description'],
+            'due_date': due_date.strftime('%Y-%m-%d'),
+            'created_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+        
+        # Store task in Redis
+        task_key = f"task:{message.from_user.id}:{datetime.now().timestamp()}"
+        redis_client.hmset(task_key, task_data)
+        
+        await message.answer(
+            f"✅ Task created successfully!\n\n"
+            f"Title: {data['title']}\n"
+            f"Description: {data['description']}\n"
+            f"Due Date: {message.text}"
+        )
+        logger.info(f"Task created for user {message.from_user.id}")
+        
     except ValueError:
         await message.answer("Invalid date format. Please use YYYY-MM-DD")
         return
     
-    await state.finish()
+    await state.clear()
 
-@dp.message_handler(commands=['mytasks'])
+@dp.message(Command("mytasks"))
 async def cmd_my_tasks(message: types.Message):
     user_id = message.from_user.id
     tasks = []

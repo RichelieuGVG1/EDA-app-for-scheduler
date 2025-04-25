@@ -1,0 +1,5 @@
+2025-04-25 06:29:31,611 - __main__ - INFO - Initializing bot with token: 8187811947...
+2025-04-25 06:29:31,612 - __main__ - INFO - Redis host: redis
+2025-04-25 06:29:31,612 - __main__ - INFO - Redis port: 6379
+2025-04-25 06:29:31,612 - __main__ - INFO - Kafka server: kafka:9092
+2025-04-25 06:29:31,633 - __main__ - INFO - Successfully connected to Redis
