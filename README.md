@@ -1,4 +1,4 @@
-# Task Management System
+# Task Management System. Проект по архитектурам
 
 A distributed task management system with deadline notifications, built as a Telegram bot.
 
