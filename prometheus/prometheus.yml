@@ -12,9 +12,6 @@ scrape_configs:
   - job_name: 'notifier-service'
     static_configs:
       - targets: ['notifier-service:8001']
-  - job_name: 'api-gateway'
-    static_configs:
-      - targets: ['api-gateway:8001'] 
 alerting:
  alertmanagers:
     - static_configs:
