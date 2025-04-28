@@ -140,13 +140,13 @@ services:
 
 
    # Сервис Alertmanager
-   alertmanager:
-      image: prom/alertmanager:v0.24.0
-      container_name: alertmanager-archapp-lab4
-      ports:
-         - "9093:9093"   # Alertmanager web UI
-      volumes:
-         - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml  # Конфигурационный файл
+  alertmanager:
+    image: prom/alertmanager:v0.24.0
+    container_name: alertmanager-archapp-lab4
+    ports:
+      - "9093:9093"   # Alertmanager web UI
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml  # Конфигурационный файл
 
 
 networks:
