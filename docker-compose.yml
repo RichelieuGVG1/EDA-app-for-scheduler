@@ -118,9 +118,8 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus:/etc/prometheus
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Конфигурационный файл
-      - ./alert_rules.yml:/etc/prometheus/alert_rules.yml  # Файл с алертами
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
@@ -146,7 +145,7 @@ services:
     ports:
       - "9093:9093"   # Alertmanager web UI
     volumes:
-      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml  # Конфигурационный файл
+      - ./prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml
 
 
 networks:

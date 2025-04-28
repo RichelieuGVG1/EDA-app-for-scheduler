@@ -1,0 +1,9 @@
+2025-04-28 14:24:47,365 - __main__ - INFO - Initializing bot with token: 8187811947...
+2025-04-28 14:24:47,365 - __main__ - INFO - Redis host: redis
+2025-04-28 14:24:47,366 - __main__ - INFO - Redis port: 6379
+2025-04-28 14:24:47,366 - __main__ - INFO - Kafka server: kafka:9092
+2025-04-28 14:24:47,370 - __main__ - INFO - Successfully connected to Redis
+2025-04-28 14:24:47,401 - __main__ - INFO - Starting bot application
+2025-04-28 14:24:47,402 - __main__ - INFO - Prometheus metrics server started on port 8001
+2025-04-28 14:24:47,405 - aiogram.dispatcher - INFO - Start polling
+2025-04-28 14:24:47,593 - aiogram.dispatcher - INFO - Run polling for bot @task_misis_bot id=8187811947 - 'task bot misis'
