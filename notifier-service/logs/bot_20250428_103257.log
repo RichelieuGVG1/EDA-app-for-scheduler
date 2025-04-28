@@ -1,0 +1,30 @@
+2025-04-28 10:32:57,545 - __main__ - INFO - Initializing bot with token: 8187811947...
+2025-04-28 10:32:57,546 - __main__ - INFO - Redis host: redis
+2025-04-28 10:32:57,546 - __main__ - INFO - Redis port: 6379
+2025-04-28 10:32:57,547 - __main__ - INFO - Kafka server: kafka:9092
+2025-04-28 10:32:57,551 - __main__ - INFO - Successfully connected to Redis
+2025-04-28 10:32:57,581 - __main__ - INFO - Starting bot application
+2025-04-28 10:32:57,583 - aiogram.dispatcher - INFO - Start polling
+2025-04-28 10:32:57,783 - aiogram.dispatcher - INFO - Run polling for bot @task_misis_bot id=8187811947 - 'task bot misis'
+2025-04-28 10:36:28,037 - __main__ - INFO - User 895164426 viewed their tasks
+2025-04-28 10:36:28,038 - aiogram.event - INFO - Update id=991745783 is handled. Duration 189 ms by bot id=8187811947
+2025-04-28 10:36:31,610 - aiogram.event - INFO - Update id=991745784 is not handled. Duration 2 ms by bot id=8187811947
+2025-04-28 10:36:34,752 - __main__ - INFO - User 895164426 viewed their tasks
+2025-04-28 10:36:34,752 - aiogram.event - INFO - Update id=991745785 is handled. Duration 130 ms by bot id=8187811947
+2025-04-28 10:36:38,757 - __main__ - INFO - Help command used by user 895164426
+2025-04-28 10:36:38,758 - aiogram.event - INFO - Update id=991745786 is handled. Duration 202 ms by bot id=8187811947
+2025-04-28 10:37:09,844 - __main__ - INFO - User 895164426 started creating a new task
+2025-04-28 10:37:09,845 - aiogram.event - INFO - Update id=991745787 is handled. Duration 75 ms by bot id=8187811947
+2025-04-28 10:37:11,843 - aiogram.event - INFO - Update id=991745788 is handled. Duration 108 ms by bot id=8187811947
+2025-04-28 10:37:13,390 - aiogram.event - INFO - Update id=991745789 is handled. Duration 176 ms by bot id=8187811947
+2025-04-28 10:37:16,817 - __main__ - INFO - Task created for user 895164426
+2025-04-28 10:37:16,818 - aiogram.event - INFO - Update id=991745790 is handled. Duration 86 ms by bot id=8187811947
+2025-04-28 10:57:59,169 - aiogram.dispatcher - ERROR - Failed to fetch updates - TelegramNetworkError: HTTP Client says - ServerDisconnectedError: Server disconnected
+2025-04-28 10:57:59,169 - aiogram.dispatcher - WARNING - Sleep for 1.000000 seconds and try again... (tryings = 0, bot id = 8187811947)
+2025-04-28 10:58:10,318 - aiogram.dispatcher - INFO - Connection established (tryings = 1, bot id = 8187811947)
+2025-04-28 11:13:43,633 - __main__ - INFO - User 895164426 started the bot
+2025-04-28 11:13:43,635 - aiogram.event - INFO - Update id=991745791 is handled. Duration 372 ms by bot id=8187811947
+2025-04-28 11:26:14,474 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2025-04-28 11:26:14,487 - aiogram.dispatcher - INFO - Polling stopped for bot @task_misis_bot id=8187811947 - 'task bot misis'
+2025-04-28 11:26:14,492 - aiogram.dispatcher - INFO - Polling stopped
+2025-04-28 11:26:14,751 - __main__ - INFO - Application shutdown completed

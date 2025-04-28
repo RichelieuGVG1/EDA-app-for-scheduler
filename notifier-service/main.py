@@ -440,6 +440,10 @@ async def on_shutdown(dp):
 if __name__ == '__main__':
     try:
         logger.info("Starting bot application")
+        # Start Prometheus metrics server
+        start_http_server(8001)
+        logger.info("Prometheus metrics server started on port 8001")
+        
         dp.run_polling(
             bot,
             on_startup=on_startup,
@@ -448,4 +452,4 @@ if __name__ == '__main__':
     except Exception as e:
         logger.error(f"Application error: {str(e)}")
     finally:
-        logger.info("Application shutdown completed") 
+        logger.info("Application shutdown completed")

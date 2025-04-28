@@ -34,3 +34,7 @@
 2025-04-25 10:13:31,791 - aiogram.event - INFO - Update id=991745780 is handled. Duration 69 ms by bot id=8187811947
 2025-04-25 10:13:37,156 - __main__ - INFO - User 895164426 viewed their tasks
 2025-04-25 10:13:37,157 - aiogram.event - INFO - Update id=991745781 is handled. Duration 76 ms by bot id=8187811947
+2025-04-25 10:18:34,806 - aiogram.dispatcher - WARNING - Received SIGTERM signal
+2025-04-25 10:18:34,807 - aiogram.dispatcher - INFO - Polling stopped for bot @task_misis_bot id=8187811947 - 'task bot misis'
+2025-04-25 10:18:34,809 - aiogram.dispatcher - INFO - Polling stopped
+2025-04-25 10:18:35,063 - __main__ - INFO - Application shutdown completed

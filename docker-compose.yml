@@ -119,6 +119,8 @@ services:
       - "9090:9090"
     volumes:
       - ./prometheus:/etc/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml  # Конфигурационный файл
+      - ./alert_rules.yml:/etc/prometheus/alert_rules.yml  # Файл с алертами
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
@@ -137,7 +139,15 @@ services:
       - task-network
 
 
-  
+   # Сервис Alertmanager
+   alertmanager:
+      image: prom/alertmanager:v0.24.0
+      container_name: alertmanager-archapp-lab4
+      ports:
+         - "9093:9093"   # Alertmanager web UI
+      volumes:
+         - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml  # Конфигурационный файл
+
 
 networks:
   task-network:

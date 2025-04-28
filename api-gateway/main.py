@@ -25,7 +25,10 @@ TASK_SERVICE_URL = os.getenv('TASK_SERVICE_URL', 'http://task-service:8000')
 
 @app.on_event("startup")
 async def startup_event():
+    # Start Prometheus metrics server on port 8001
     start_http_server(8001)
+    print(f"Prometheus metrics server started on port 8001")  # For debugging
+    # You might want to use proper logging here in production
 
 @app.post("/tasks/")
 @REQUEST_LATENCY.time()
@@ -53,4 +56,4 @@ async def get_task(task_id: str):
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"} 
+    return {"status": "healthy"}
