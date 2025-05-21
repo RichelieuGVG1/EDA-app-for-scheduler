@@ -332,7 +332,7 @@ async def process_reschedule(callback_query: types.CallbackQuery):
         
         # Send confirmation message
         await callback_query.message.edit_text(
-            f"✅ Task rescheduled to {new_due_date.strftime('%Y-%m-%d')}",
+            f"Task rescheduled to {new_due_date.strftime('%Y-%m-%d')}",
             reply_markup=None
         )
         
@@ -340,7 +340,7 @@ async def process_reschedule(callback_query: types.CallbackQuery):
         logger.info(f"Task {task_id} rescheduled for user {user_id}")
     else:
         await callback_query.message.edit_text(
-            "❌ Task not found",
+            "Task not found",
             reply_markup=None
         )
 
@@ -359,7 +359,7 @@ async def process_complete(callback_query: types.CallbackQuery):
         
         # Send confirmation message
         await callback_query.message.edit_text(
-            "✅ Task marked as completed",
+            "Task marked as completed",
             reply_markup=None
         )
         
