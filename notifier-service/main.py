@@ -250,7 +250,7 @@ async def process_kafka_messages():
                             
                         if status == 'overdue':
                             message_text = (
-                                f"⚠️ Task Overdue!\n\n"
+                                f"Task Overdue!\n\n"
                                 f"Task: {task_title}\n"
                                 f"Due Date: {due_date}\n\n"
                                 f"This task is overdue by 1 day!"
@@ -283,7 +283,7 @@ async def process_kafka_messages():
                             logger.info(f"Overdue task notification sent to user {user_id}")
                         else:
                             message_text = (
-                                f"🔔 Task Reminder\n\n"
+                                f"Task Reminder\n\n"
                                 f"Task: {task_title}\n"
                                 f"Due Date: {due_date}\n\n"
                                 f"This task is due soon!"
@@ -367,7 +367,7 @@ async def process_complete(callback_query: types.CallbackQuery):
         logger.info(f"Task {task_id} completed by user {user_id}")
     else:
         await callback_query.message.edit_text(
-            "❌ Task not found",
+            "Task not found",
             reply_markup=None
         )
 
@@ -401,7 +401,7 @@ async def handle_task_notification(body):
         
         if user_id and task_title and due_date:
             message_text = (
-                f"🔔 Task Reminder\n\n"
+                f"Task Reminder\n\n"
                 f"Task: {task_title}\n"
                 f"Due Date: {due_date}\n\n"
                 f"This task is due soon!"
